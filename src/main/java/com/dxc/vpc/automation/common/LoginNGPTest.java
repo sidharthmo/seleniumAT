@@ -80,17 +80,24 @@ public class LoginNGPTest {
 		connector.log.info("Selecting Customer");
 		String dataCenterXpath ="//*[@id='default_dc_link']";
 		connector.waitUntilElementIsPresentByXpath(dataCenterXpath);
-		connector.selectDropDownElementByXpath(dataCenterXpath);
-		String dataCenterXpath1 ="//dc-selector/div/dl/ul/li[3]/a";
-		connector.waitUntilElementIsPresentByXpath(dataCenterXpath1);
-		connector.selectDropDownElementByXpath(dataCenterXpath1);
-		//Selecting index 2
+		connector.selectByXpath(dataCenterXpath);
+		connector.selectCustomerByName("Markham - PB1DEVCAN");
+
 		
 		
 	}
 	@Then("^Go to Datacenter and sort by groupByUserCI$")
 	public void selectDataCenter() {
 		connector.log.info("going to dataCenter");
+		String clickXpath ="//div[1]/div/sort-selector[2]/a";
+/*		String Id = "sort-types301129211";
+		connector.sleep(1000);
+		//connector.waitUntilElementIsPresentById(clickXpath);
+		connector.clickcById(clickXpath);
+		connector.waitUntilElementIsPresentById("//sort-selector[2]/ul/li[3]/strong");
+		connector.grouping();*/
+		
+		
 		String dataCenterXpath2 ="//div/div[1]/div/sort-selector[2]/a";
 		connector.waitUntilElementIsPresentByXpath(dataCenterXpath2);
 		connector.selectDropDownElementByXpath(dataCenterXpath2);

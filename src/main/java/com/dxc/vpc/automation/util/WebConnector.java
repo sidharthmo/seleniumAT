@@ -3,7 +3,6 @@ package com.dxc.vpc.automation.util;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +14,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WebConnector {
@@ -112,6 +110,7 @@ public class WebConnector {
 		WebDriverWait wait =getWebDriverWaitInstance();
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(loginId)));
 		log.debug("retuned navigateToURL ");
+		sleep(2000);
 	}
 	
 	// clicking on any object
@@ -123,9 +122,9 @@ public class WebConnector {
 	
 	public void enterTextById(String text, String objectName){
 		log.debug("Typing in " + objectName+ " with Id " +text);
+		waitUntilElementIsPresentById(text);
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(text)));
 		log.debug("Is Element present " + selenium.findElement(By.id(text)).isDisplayed());
-		sleep(100);
 		selenium.findElement(By.id(text)).sendKeys(objectName);
 		log.debug("retuned enterTextById ");
 	}
@@ -136,15 +135,26 @@ public class WebConnector {
 		log.debug("retuned selectByXpath ");
 	}
 	
+	public  void selectCustomerByName(String customerName)	{
+		log.debug("inside selectCustomerByName "+ customerName);
+		String customerXpath="//subheader/div/div/div/dc-selector/div/dl/ul/li";
+		waitUntilElementIsPresentByXpath(customerXpath);
+		List<WebElement> itr  = selenium.findElements(By.xpath(customerXpath));
+		int counter = 1;
+		for(WebElement ele : itr)
+		{
+            if(ele.getText().equals(customerName)) 	{
+            	String xpath =customerXpath+"[" +counter+"]";
+            	selectByXpath(xpath);
+            										}
+            counter++;
+        }
+		log.debug("retuned selectCustomerByName ");
+															}
+	
 	public void selectDropDownElementByXpath(String xPath){
 		log.debug("selectDropDownElementByXpath "+ xPath);
-		WebElement test = selenium.findElement(By.id("default_dc_link"));
-		Select drpSelect = new Select(test);
-		System.out.println("Testing ----");
-		System.out.println(drpSelect.getAllSelectedOptions());
-		drpSelect.selectByVisibleText("Wynyard");
-		System.out.println("Testing ----Wynyard");
-		//selenium.findElement(By.xpath(xPath)).click();
+		selenium.findElement(By.xpath(xPath)).click();
 		log.debug("retuned selectDropDownElementByXpath ");
 
 	}
@@ -179,64 +189,62 @@ public class WebConnector {
 		}
 		log.debug("retuned from sleep function ");
 	}
+
+	public  void explicitWait() 
+	{
+		waitUntilElementIsPresentByXpath("//ui-view/div/div/div[2]");
+		List<WebElement> itr = selenium.findElements(By.xpath("//statistics-list/div/div[1]/div"));
+		int counter = 1;
+		int counter1 = 1;
+		for(WebElement ele : itr)
+		{
+			System.out.println("*************************************");
+			System.out.println(ele.getTagName());
+	        System.out.println(ele.getText());
+			if(ele.getText().contains("ian.jones@hpe.com")) 	
+			{
+				System.out.println("inside 1st loop");
+				String baseXpath = "//statistics-list/div/div[1]/div["+counter;
+	            String dropDownXpath =baseXpath+"]/statistics-list-item/div/div[1]";
+	            selectByXpath(dropDownXpath);
+	            String itemXpath = baseXpath+"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
+	            System.out.println(itemXpath);
+	            waitUntilElementIsPresentByXpath(itemXpath);
+	            List<WebElement> itr1 = selenium.findElements(By.xpath(itemXpath));
+	            for(WebElement ele1 : itr1)
+	            {
+	            	System.out.println("++++++++++++++++++++++++++++++++");
+	    			System.out.println(ele1.getTagName());
+	    	        System.out.println(ele1.getText());
+	    	        if(ele1.getText().contains("Block Storage for Physical Servers")) {
+	    	        	System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
+	    	        	String itemXpath1 =baseXpath +"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div[2]/statistics-list-item/div/div[1]";
+	    	        	System.out.println(itemXpath1);
+	    	        	waitUntilElementIsPresentByXpath(itemXpath1);
+	    	        	selectByXpath(itemXpath1);
+	    	        	String itemXpath2 ="//statistics-list/div/div[1]/div[6]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div[2]/statistics-list-item/item-indent/div/div[2]/service-list/div[1]/subscription-list-item/div/div/div[1]";
+	    	        	waitUntilElementIsPresentByXpath(itemXpath2);
+	    	        	selectByXpath(itemXpath2);
+	    	        	waitUntilElementIsPresentByXpath("//subheader/div/div/div");
+	    	        	break;
+	    	        	
+	    	        }
+	    	        counter1++;
+	    	        
+	            }
+	            	
+	           }
+	            counter++;
+	        }
+
+
+	}
 	
-	public  void explicitWait() {
-		int maxWaitTime =100;
-		int i=0;
-		int waitTime=10;
-		String xpath ="ng-scope";
-		
-		 //a = selenium.findElements(By.className(xpath)).iterator();
 
-		 List<WebElement> elements = selenium.findElements(By.xpath("//ui-view/div/div/div[2]"));
-		 sleep(1000);
-		 Iterator<WebElement> itr = elements.iterator();
-		 while(itr.hasNext()) {
-			 WebElement test = itr.next();
-		     System.out.println(test.getText());
-		     System.out.println(test.getClass());
-		     System.out.println(test.getTagName());
-		     System.out.println(test.toString());
-		     if ((test.getText()).contains("migration")) {
-		    	 wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//statistics-list-item/div/div[1]")));
-		    	 test.findElement(By.xpath("//statistics-list-item/div/div[1]")).click();
-		    	 
-		     }
-		 }
-
-			/*while(a != null) {
-			
-			if(i != maxWaitTime ) {
-				try {
-					Thread.sleep(waitTime);
-					i= i + waitTime;
-					a = ""+selenium.findElements(By.className(xpath)).size();
-					} catch (InterruptedException e) {
-								e.printStackTrace();
-			}
-			}
-			
-		}
-		
-*/	}
 	
 	public  void closeBrowser(){
-
-		//div[2]/ui-view/div/div/div[2]/div
-		int a = selenium.findElements(By.className("ng-scope")).size();
-		System.out.println(a);
-
-		//waitUntilElementIsPresentByXpath("//div/sort-selector[2]/ul/li[3]/a");
-		//selenium.findElement(By.xpath("//div/sort-selector[2]/ul/li[3]/a")).click();
-
-		
-		//selenium.close();
-		//Select dropdown = new Select(driver.findElement(By.xpath("//*[@id='sort-types195147279']/li[2]/a")));
-		//dropdown.selectByIndex(1);
-		//dropdown.selectByVisibleText("Group By Catalog Item And Owner");
-		//driver.findElement(By.id(text)).sendKeys(objectName);
-
-											}
+		selenium.close();
+							}
 	/// ****************Application dependent functions************************ ///
 
 	//Singleton for WebConnector/
