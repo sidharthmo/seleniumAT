@@ -1,10 +1,10 @@
 package com.dxc.vpc.automation.util;
 
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -190,58 +190,88 @@ public class WebConnector {
 		log.debug("retuned from sleep function ");
 	}
 
-	public  void explicitWait() 
-	{
-		waitUntilElementIsPresentByXpath("//ui-view/div/div/div[2]");
-		List<WebElement> itr = selenium.findElements(By.xpath("//statistics-list/div/div[1]/div"));
+	private String customerExpendIconXpath ="]/statistics-list-item/div/div[1]";
+	private String detailHeaderXpath ="//subheader/div/div/div";
+	private String baseXpath = "//statistics-list/div/div[1]/div[";
+	private String customerExpendGridDataXpath = "]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
+
+	public void getRespectiveCustomerFromGrid(String gridDataXpath,String customerName,String serverName) {
+		List<WebElement> itr = selenium.findElements(By.xpath(gridDataXpath));
 		int counter = 1;
-		int counter1 = 1;
 		for(WebElement ele : itr)
 		{
-			System.out.println("*************************************");
-			System.out.println(ele.getTagName());
-	        System.out.println(ele.getText());
-			if(ele.getText().contains("ian.jones@hpe.com")) 	
-			{
-				System.out.println("inside 1st loop");
-				String baseXpath = "//statistics-list/div/div[1]/div["+counter;
-	            String dropDownXpath =baseXpath+"]/statistics-list-item/div/div[1]";
-	            selectByXpath(dropDownXpath);
-	            String itemXpath = baseXpath+"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
-	            System.out.println(itemXpath);
-	            waitUntilElementIsPresentByXpath(itemXpath);
-	            List<WebElement> itr1 = selenium.findElements(By.xpath(itemXpath));
-	            for(WebElement ele1 : itr1)
-	            {
-	            	System.out.println("++++++++++++++++++++++++++++++++");
-	    			System.out.println(ele1.getTagName());
-	    	        System.out.println(ele1.getText());
-	    	        if(ele1.getText().contains("Block Storage for Physical Servers")) {
-	    	        	System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAA");
-	    	        	String itemXpath1 =baseXpath +"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div[2]/statistics-list-item/div/div[1]";
-	    	        	System.out.println(itemXpath1);
-	    	        	waitUntilElementIsPresentByXpath(itemXpath1);
-	    	        	selectByXpath(itemXpath1);
-	    	        	String itemXpath2 ="//statistics-list/div/div[1]/div[6]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div[2]/statistics-list-item/item-indent/div/div[2]/service-list/div[1]/subscription-list-item/div/div/div[1]";
-	    	        	waitUntilElementIsPresentByXpath(itemXpath2);
-	    	        	selectByXpath(itemXpath2);
-	    	        	waitUntilElementIsPresentByXpath("//subheader/div/div/div");
-	    	        	break;
-	    	        	
-	    	        }
-	    	        counter1++;
-	    	        
-	            }
-	            	
-	           }
-	            counter++;
-	        }
+			if(ele.getText().contains(customerName)) {
 
+				clickRespectiveCustomerFromGrid(baseXpath+counter+customerExpendIconXpath,baseXpath+counter+customerExpendGridDataXpath);
+				getRespectiveCustomerDetail(baseXpath+counter,serverName);
+				break;
+			}
+			counter++;	
 
+	}
+	}
+	public void clickRespectiveCustomerFromGrid(String customerExpendIconXpath, String customerExpendGridDataXpath) {
+        selectByXpath(customerExpendIconXpath);
+        waitUntilElementIsPresentByXpath(customerExpendGridDataXpath);
+    
 	}
 	
 
+	public void getRespectiveCustomerDetail(String baseXpath,String serverName) {
+		String customerExpendGridDataXpath = baseXpath+"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
+		int counter = 1;
+		List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataXpath));
+        for(WebElement ele : itr)
+        {
+            if(ele.getText().contains(serverName)) {
+            	String customerExpendGridDataDropDownIconXpath =baseXpath +"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div["+counter+"]/statistics-list-item";
+            	waitUntilElementIsPresentByXpath(customerExpendGridDataDropDownIconXpath+"/div/div[1]");
+            	selectByXpath(customerExpendGridDataDropDownIconXpath+"/div/div[1]");
+            	expendRespectiveCustomerDetail(customerExpendGridDataDropDownIconXpath);
+            	break;
+            	
+            }
+	        counter++;
+	        
+        }
+	}
 	
+	public void expendRespectiveCustomerDetail(String customerExpendGridDataDropDownIconXpath) {
+    	List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataDropDownIconXpath+"/item-indent/div/div[2]/service-list/div[1]/subscription-list-item"));
+    	int randomNumber=randInt(1, itr.size());
+    	String detailIconXpath= customerExpendGridDataDropDownIconXpath+"/item-indent/div/div[2]/service-list/div[1]/subscription-list-item"+"["+randomNumber+"]/div/div/div[1]/a/icon/div";
+    	waitUntilElementIsPresentByXpath(detailIconXpath);
+    	selectByXpath(detailIconXpath);
+/*            	for(WebElement ele1 : itr)
+        {
+        	System.out.println(ele1.getText());
+        	
+        	
+        }*/
+
+    	waitUntilElementIsPresentByXpath(detailHeaderXpath);
+    	
+	}
+	public  void selectItemFromDropDown(String xpath,String Name){
+		waitUntilElementIsPresentByXpath(xpath);
+    	List<WebElement> itr = selenium.findElements(By.xpath(xpath));
+    	int counter =1;
+        for(WebElement ele : itr)
+        {
+        	System.out.println(ele.getText());
+            if(ele.getText().equalsIgnoreCase(Name)) {
+            	System.out.println(ele.getText());
+            	String a =xpath +"["+counter+"]";
+            	waitUntilElementIsPresentByXpath(a);
+            	selectByXpath(a);
+            	break;
+            	
+            }
+	        counter++;
+	        
+        }
+
+								}
 	public  void closeBrowser(){
 		selenium.close();
 							}
@@ -263,6 +293,12 @@ public class WebConnector {
 	//Logging Object/
 	public void log(String msg){
 		log(msg);
+	}
+	
+	public static int randInt(int min, int max) {
+	    Random rand = new Random();
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+	    return randomNum;
 	}
 
 }

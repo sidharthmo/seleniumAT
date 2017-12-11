@@ -4,9 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Properties;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-
 import com.dxc.vpc.automation.util.WebConnector;
 
 import cucumber.api.java.en.And;
@@ -81,33 +78,62 @@ public class LoginNGPTest {
 		String dataCenterXpath ="//*[@id='default_dc_link']";
 		connector.waitUntilElementIsPresentByXpath(dataCenterXpath);
 		connector.selectByXpath(dataCenterXpath);
-		connector.selectCustomerByName("Markham - PB1DEVCAN");
+		//connector.selectCustomerByName("Markham - PB1DEVCAN");
+		connector.selectItemFromDropDown("//subheader/div/div/div/dc-selector/div/dl/ul/li","Markham - PB1DEVCAN");
 
 		
 		
 	}
-	@Then("^Go to Datacenter and sort by groupByUserCI$")
-	public void selectDataCenter() {
+	@Then("^Sort the customer list  by \"([^\"]*)\"$")
+	public void selectDataCenter(String Sorting) {
 		connector.log.info("going to dataCenter");
-		String clickXpath ="//div[1]/div/sort-selector[2]/a";
-/*		String Id = "sort-types301129211";
+		String groupingDropDownXpath ="//div[1]/div/sort-selector[2]/a";
+		String selectDropDownxpath="//div/sort-selector[2]/ul/li";
+		//NO GROUPING--- GROUP BY CATALOG ITEM AND OWNER-----GROUP BY OWNER AND CATALOG ITEM
+		String dropDownName= "Group By Owner And Catalog Item";
+		connector.waitUntilElementIsPresentByXpath(groupingDropDownXpath);
+		connector.selectDropDownElementByXpath(groupingDropDownXpath);
 		connector.sleep(1000);
-		//connector.waitUntilElementIsPresentById(clickXpath);
-		connector.clickcById(clickXpath);
-		connector.waitUntilElementIsPresentById("//sort-selector[2]/ul/li[3]/strong");
-		connector.grouping();*/
-		
-		
-		String dataCenterXpath2 ="//div/div[1]/div/sort-selector[2]/a";
-		connector.waitUntilElementIsPresentByXpath(dataCenterXpath2);
-		connector.selectDropDownElementByXpath(dataCenterXpath2);
+		connector.selectItemFromDropDown(selectDropDownxpath,dropDownName);
+
+/*		String groupingDropDownXpath ="//div[1]/div/sort-selector[2]/a";
+		String groupingDropDown3rdElementXpath ="//div/sort-selector[2]/ul/li[3]/a";
+		String gridDataXpath="//statistics-list/div/div[1]/div";
+		String customerName = "lukas.vrab@hpe.com";
+		String serverName = "Backups";
+		connector.waitUntilElementIsPresentByXpath(groupingDropDownXpath);
+		connector.selectDropDownElementByXpath(groupingDropDownXpath);
 		connector.sleep(1000);
-		String dataCenterXpath ="//div/sort-selector[2]/ul/li[3]/a";
-		connector.waitUntilElementIsPresentByXpath(dataCenterXpath);
-		connector.selectDropDownElementByXpath(dataCenterXpath);
-		WebConnector.getWebDriverWaitInstance().until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ui-view/div/div/div[2]")));
-		connector.explicitWait();
+		connector.waitUntilElementIsPresentByXpath(groupingDropDown3rdElementXpath);
+		connector.selectDropDownElementByXpath(groupingDropDown3rdElementXpath);
+		connector.waitUntilElementIsPresentByXpath(gridDataXpath);
+		connector.getRespectiveCustomerFromGrid(gridDataXpath,customerName,serverName);*/
+		
+	}
+	
+	@Then("^Select customer \"([^\"]*)\"$")
+	public void selectCustomerFromGrid(String CustomerName) {
+		String customerName = "lukas.vrab@hpe.com";
+		String gridDataXpath="//statistics-list/div/div[1]/div";
+		String serverName = "Backups";
+		connector.waitUntilElementIsPresentByXpath(gridDataXpath);
+		connector.getRespectiveCustomerFromGrid(gridDataXpath,customerName,serverName);
+	}
+	
+	@Then("^expend the \"([^\"]*)\" Server$")
+	public void getServerList(String CustomerDetail) {
+		
 		
 	}
 
+	@Then("^Click the service detail from available list$")
+	public void expendCustomerFromGrid() {
+
+		
+	}
+	
+	@Then("^Service detail page should get loaded$")
+	public void validateServiceDetailPage() {
+		//connector.closeBrowser();
+	}
 }
