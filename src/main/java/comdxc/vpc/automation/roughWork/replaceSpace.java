@@ -1,22 +1,21 @@
 package comdxc.vpc.automation.roughWork;
 
+import java.util.Random;
+
 public class replaceSpace {
 
 	public static void main(String[] args) {
-		String a = "Chase Cooper Storage - 2017.11.14.xlsx";
-		System.out.println(a);
-		replaceSpace replaceSpace =new replaceSpace();
-		replaceSpace.replaceWhitespace(a);
+		int a =randInt(1,5);
 		System.out.println(a);
 
 	}
 	
-	 private String replaceWhitespace(String str) {
-		    if (str.contains(" ")) {
-		    	System.out.println("testing");
-		        str = str.replaceAll(" ", "%20");
-		    }
-		    return str;
-	     }
+	public static int randInt(int min, int max) {
+	    Random rand = new Random();
+
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+	    return randomNum;
+	}
 
 }
