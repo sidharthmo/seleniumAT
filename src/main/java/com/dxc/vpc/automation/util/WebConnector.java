@@ -1,6 +1,8 @@
 package com.dxc.vpc.automation.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
@@ -16,10 +18,15 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.dxc.vpc.automation.constant.LoginPageConstant;
+import com.dxc.vpc.automation.constant.ServicesPageConstant;
+
+
+
 public class WebConnector {
 
 	
-	public Logger log = Logger.getLogger("vpgLog");
+	public Logger log = Logger.getLogger("vpcLog");
 	static WebDriver selenium =null;
 	WebDriver mozilla=null;
 	WebDriver chrome=null;
@@ -28,27 +35,33 @@ public class WebConnector {
 	static WebDriverWait wait;
 	static WebConnector w;
 	private Properties localProperties=null;
+	private String customerExpendIconXpath =ServicesPageConstant.customerExpendIconXpath;
+	private String detailHeaderXpath =ServicesPageConstant.detailHeaderXpath;
+	private String baseXpath = ServicesPageConstant.baseXpath;
+	private String customerExpendGridDataXpath = ServicesPageConstant.customerExpendGridDataXpath;
 
 
 	
 	private WebConnector(){
-		getConfigration();
+		try {
+			getConfigration();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 
-	// Rading Configration and loading once
-	public void getConfigration(){
-		String str = "config.properties";
-		InputStream localInputStream = ClassLoader.getSystemResourceAsStream(str);
-		if (localInputStream == null) {
-			localInputStream = WebConnector.class.getResourceAsStream(str);
-			
-		}
+	// Reading Configuration and loading once
+	public void getConfigration() throws FileNotFoundException{
+		String str = System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"resources"+File.separator+"config.properties";
+		InputStream localInputStream = new FileInputStream(str);
+
 		if (localInputStream != null) {
 			localProperties = new Properties();
 			try {
 				localProperties.load(localInputStream);
 			} catch (Exception e) {
+				log.info("config properties not loaded"+ e);
 			}
 		}
 	}
@@ -59,7 +72,7 @@ public class WebConnector {
 	
 
 	
-
+	// Reading XLS
 	public XlsReader getDatatable(String xlspath) {
 		String xlsLocation = System.getProperty("user.dir")+File.separator+"src"+File.separator+"main"+File.separator+"resources"+File.separator+xlspath;
 		System.out.println("Reading xls file from" + xlsLocation);
@@ -102,30 +115,30 @@ public class WebConnector {
 	// navigates to a URL
 	public void navigateToURL(String URL) {
 		//driver.navigate()
-		log.debug("navigate to URL "+URL);
+		log.debug("Loading URL "+URL);
 		selenium.get(URL);
 		selenium.manage().timeouts().implicitlyWait(3000, TimeUnit.SECONDS);
 		selenium.manage().timeouts().pageLoadTimeout(3000, TimeUnit.SECONDS);
-		String loginId ="submit";
+		String loginId =LoginPageConstant.SUBMITBUTTONID;
 		WebDriverWait wait =getWebDriverWaitInstance();
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(loginId)));
 		log.debug("retuned navigateToURL ");
 		sleep(2000);
 	}
 	
-	// clicking on any object
+	// clicking on any object By ID
 	public void clickcById(String text){
 		log.debug("Clicking on " + text);
 		selenium.findElement(By.id("submit")).click();
 		log.debug("retuned clickcById ");
 	}
 	
-	public void enterTextById(String text, String objectName){
-		log.debug("Typing in " + objectName+ " with Id " +text);
+	public void enterTextById(String text, String keys){
+		log.debug("Typing in " + keys+ " with Id " +text);
 		waitUntilElementIsPresentById(text);
 		wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(text)));
 		log.debug("Is Element present " + selenium.findElement(By.id(text)).isDisplayed());
-		selenium.findElement(By.id(text)).sendKeys(objectName);
+		selenium.findElement(By.id(text)).sendKeys(keys);
 		log.debug("retuned enterTextById ");
 	}
 	
@@ -137,7 +150,7 @@ public class WebConnector {
 	
 	public  void selectCustomerByName(String customerName)	{
 		log.debug("inside selectCustomerByName "+ customerName);
-		String customerXpath="//subheader/div/div/div/dc-selector/div/dl/ul/li";
+		String customerXpath=ServicesPageConstant.dataCenterDropDownListXpath;
 		waitUntilElementIsPresentByXpath(customerXpath);
 		List<WebElement> itr  = selenium.findElements(By.xpath(customerXpath));
 		int counter = 1;
@@ -190,10 +203,7 @@ public class WebConnector {
 		log.debug("retuned from sleep function ");
 	}
 
-	private String customerExpendIconXpath ="]/statistics-list-item/div/div[1]";
-	private String detailHeaderXpath ="//subheader/div/div/div";
-	private String baseXpath = "//statistics-list/div/div[1]/div[";
-	private String customerExpendGridDataXpath = "]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
+
 
 	public void getRespectiveCustomerFromGrid(String gridDataXpath,String customerName,String serverName) {
 		List<WebElement> itr = selenium.findElements(By.xpath(gridDataXpath));
@@ -218,15 +228,15 @@ public class WebConnector {
 	
 
 	public void getRespectiveCustomerDetail(String baseXpath,String serverName) {
-		String customerExpendGridDataXpath = baseXpath+"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div";
+		String customerExpendGridDataXpath = baseXpath+ServicesPageConstant.customerExpendGridDataXpath;
 		int counter = 1;
 		List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataXpath));
         for(WebElement ele : itr)
         {
             if(ele.getText().contains(serverName)) {
-            	String customerExpendGridDataDropDownIconXpath =baseXpath +"]/statistics-list-item/item-indent/div/div[2]/statistics-list/div/div[1]/div["+counter+"]/statistics-list-item";
-            	waitUntilElementIsPresentByXpath(customerExpendGridDataDropDownIconXpath+"/div/div[1]");
-            	selectByXpath(customerExpendGridDataDropDownIconXpath+"/div/div[1]");
+            	String customerExpendGridDataDropDownIconXpath =baseXpath +ServicesPageConstant.customerExpendGridDataDropDownIconFirstHalfXpath+counter+ServicesPageConstant.customerExpendGridDataDropDownIconSecondHalfXpath;
+            	waitUntilElementIsPresentByXpath(customerExpendGridDataDropDownIconXpath+ServicesPageConstant.customerExpendGridDataDropDownIconXpath);
+            	selectByXpath(customerExpendGridDataDropDownIconXpath+ServicesPageConstant.customerExpendGridDataDropDownIconXpath);
             	expendRespectiveCustomerDetail(customerExpendGridDataDropDownIconXpath);
             	break;
             	
@@ -237,9 +247,9 @@ public class WebConnector {
 	}
 	
 	public void expendRespectiveCustomerDetail(String customerExpendGridDataDropDownIconXpath) {
-    	List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataDropDownIconXpath+"/item-indent/div/div[2]/service-list/div[1]/subscription-list-item"));
+    	List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataDropDownIconXpath+ServicesPageConstant.expendRespectiveCustomerDetailListXpath));
     	int randomNumber=randInt(1, itr.size());
-    	String detailIconXpath= customerExpendGridDataDropDownIconXpath+"/item-indent/div/div[2]/service-list/div[1]/subscription-list-item"+"["+randomNumber+"]/div/div/div[1]/a/icon/div";
+    	String detailIconXpath= customerExpendGridDataDropDownIconXpath+ServicesPageConstant.expendRespectiveCustomerDetailListXpath+"["+randomNumber+"]"+ServicesPageConstant.expendRespectiveCustomerDetailListDetailXpath;
     	waitUntilElementIsPresentByXpath(detailIconXpath);
     	selectByXpath(detailIconXpath);
 /*            	for(WebElement ele1 : itr)
@@ -261,9 +271,9 @@ public class WebConnector {
         	System.out.println(ele.getText());
             if(ele.getText().equalsIgnoreCase(Name)) {
             	System.out.println(ele.getText());
-            	String a =xpath +"["+counter+"]";
-            	waitUntilElementIsPresentByXpath(a);
-            	selectByXpath(a);
+            	String iconXpath =xpath +"["+counter+"]";
+            	waitUntilElementIsPresentByXpath(iconXpath);
+            	selectByXpath(iconXpath);
             	break;
             	
             }
@@ -290,7 +300,7 @@ public class WebConnector {
 		return wait;
 	}
 	
-	//Logging Object/
+	//Logging Object
 	public void log(String msg){
 		log(msg);
 	}

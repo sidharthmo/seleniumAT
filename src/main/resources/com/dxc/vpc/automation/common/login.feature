@@ -6,7 +6,7 @@ I want to login and verify the service detail of migrated user
 
 @login
 Scenario: Service detail for respective customer 
-Given I navigate to "NGPURL" on "Browser"
+Given I navigate to NGPURL on Browser
 And I enter "loginUserName" and "loginPassword"
 And I click on loginButton
 When User gets loggedin successfully
