@@ -1,16 +1,25 @@
 package com.dxc.vpc.automation.util;
 
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -148,22 +157,7 @@ public class WebConnector {
 		log.debug("retuned selectByXpath ");
 	}
 	
-	public  void selectCustomerByName(String customerName)	{
-		log.debug("inside selectCustomerByName "+ customerName);
-		String customerXpath=ServicesPageConstant.dataCenterDropDownListXpath;
-		waitUntilElementIsPresentByXpath(customerXpath);
-		List<WebElement> itr  = selenium.findElements(By.xpath(customerXpath));
-		int counter = 1;
-		for(WebElement ele : itr)
-		{
-            if(ele.getText().equals(customerName)) 	{
-            	String xpath =customerXpath+"[" +counter+"]";
-            	selectByXpath(xpath);
-            										}
-            counter++;
-        }
-		log.debug("retuned selectCustomerByName ");
-															}
+
 	
 	public void selectDropDownElementByXpath(String xPath){
 		log.debug("selectDropDownElementByXpath "+ xPath);
@@ -205,7 +199,7 @@ public class WebConnector {
 
 
 
-	public void getRespectiveCustomerFromGrid(String gridDataXpath,String customerName,String serverName) {
+	public void getRespectiveCustomerFromGrid(String gridDataXpath,String customerName,String serverName) throws Exception {
 		List<WebElement> itr = selenium.findElements(By.xpath(gridDataXpath));
 		int counter = 1;
 		for(WebElement ele : itr)
@@ -214,11 +208,11 @@ public class WebConnector {
 
 				clickRespectiveCustomerFromGrid(baseXpath+counter+customerExpendIconXpath,baseXpath+counter+customerExpendGridDataXpath);
 				getRespectiveCustomerDetail(baseXpath+counter,serverName);
-				break;
+				return;
 			}
 			counter++;	
 
-	}
+	}throw new Exception();
 	}
 	public void clickRespectiveCustomerFromGrid(String customerExpendIconXpath, String customerExpendGridDataXpath) {
         selectByXpath(customerExpendIconXpath);
@@ -227,7 +221,7 @@ public class WebConnector {
 	}
 	
 
-	public void getRespectiveCustomerDetail(String baseXpath,String serverName) {
+	public void getRespectiveCustomerDetail(String baseXpath,String serverName) throws Exception {
 		String customerExpendGridDataXpath = baseXpath+ServicesPageConstant.customerExpendGridDataXpath;
 		int counter = 1;
 		List<WebElement> itr = selenium.findElements(By.xpath(customerExpendGridDataXpath));
@@ -238,12 +232,12 @@ public class WebConnector {
             	waitUntilElementIsPresentByXpath(customerExpendGridDataDropDownIconXpath+ServicesPageConstant.customerExpendGridDataDropDownIconXpath);
             	selectByXpath(customerExpendGridDataDropDownIconXpath+ServicesPageConstant.customerExpendGridDataDropDownIconXpath);
             	expendRespectiveCustomerDetail(customerExpendGridDataDropDownIconXpath);
-            	break;
+            	return;
             	
             }
 	        counter++;
 	        
-        }
+        }throw new Exception();
 	}
 	
 	public void expendRespectiveCustomerDetail(String customerExpendGridDataDropDownIconXpath) {
@@ -262,26 +256,94 @@ public class WebConnector {
     	waitUntilElementIsPresentByXpath(detailHeaderXpath);
     	
 	}
-	public  void selectItemFromDropDown(String xpath,String Name){
+	public  void selectItemFromDropDown(String xpath,String Name) throws Exception{
 		waitUntilElementIsPresentByXpath(xpath);
     	List<WebElement> itr = selenium.findElements(By.xpath(xpath));
     	int counter =1;
+    	String iconXpath = null;
         for(WebElement ele : itr)
         {
-        	System.out.println(ele.getText());
             if(ele.getText().equalsIgnoreCase(Name)) {
-            	System.out.println(ele.getText());
-            	String iconXpath =xpath +"["+counter+"]";
+            	iconXpath =xpath +"["+counter+"]";
             	waitUntilElementIsPresentByXpath(iconXpath);
             	selectByXpath(iconXpath);
-            	break;
-            	
+            	break;  	
             }
-	        counter++;
-	        
+	        counter++;        
         }
+        
+        if(iconXpath == null) {
+        	throw new Exception("Message");
+        }
+        
+	}
+    //TODO
+    //page should be scrolled until all items are loaded.Login need to be updated   
+    	public void  scrollPageByXpath(String xpath) throws Exception {
+    	    List<WebElement> initialItem = selenium.findElements(By.xpath(xpath));
+    	    int initialCount =initialItem.size();
+    		scrollPage();
+    	    List<WebElement> updatedItem = selenium.findElements(By.xpath(xpath));
+    	    int itemSize =updatedItem.size();
 
-								}
+    	    for(initialCount=0;initialCount<=itemSize;initialCount++) {
+    	    	scrollPage();
+    	    	
+    	    }
+	
+    	}
+    	
+    	public void  scrollPageByXpath1(String xpath) throws Exception {
+    	    List<WebElement> initialItem = selenium.findElements(By.xpath(xpath));
+    	    int prvSize =initialItem.size();
+    		scrollPage();
+    	    List<WebElement> updatedItem = selenium.findElements(By.xpath(xpath));
+    	    int newSize =updatedItem.size();
+
+    	    while (true) {
+    	    	if(prvSize == newSize) {
+    	    		break;
+    	    	}else if (newSize > prvSize) {
+    	    		prvSize = newSize;
+    	    		scrollPage();
+    	    		updatedItem = selenium.findElements(By.xpath(xpath));
+    	    	    newSize =updatedItem.size();
+    	    	}
+    	    }
+
+	
+    	}
+    	public void  scrollPage()throws Exception {
+    		
+    		Robot robot = new Robot();
+       		int counter =50;
+    	    for(int i=0;i<=counter;i++){  
+    	    	robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+        		robot.keyRelease(KeyEvent.VK_PAGE_DOWN);
+    	    } 
+    	    sleep(100);
+    	}
+    	
+    	public void takeScreenShot() throws IOException{
+    		File scrFile = ((TakesScreenshot)selenium).getScreenshotAs(OutputType.FILE);
+    		
+    		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+    		Calendar cal = Calendar.getInstance();
+    		System.out.println(dateFormat.format(cal.getTime()));
+    		
+    		String scrFilepath = scrFile.getAbsolutePath();
+    		System.out.println("scrFilepath: " +scrFilepath);
+    		
+    		File currentDirFile = new File("Screenshots");
+    		String path = currentDirFile.getAbsolutePath();
+    		System.out.println("path: " +path+"+++");
+    		
+    		System.out.println("****\n"+path+"\\screenshot"+dateFormat.format(cal.getTime())+".jpg");
+    		FileUtils.copyFile(scrFile, new File(path+"\\screenshot"+dateFormat.format(cal.getTime())+".jpg"));
+    		
+    	}
+    	
+								
 	public  void closeBrowser(){
 		selenium.close();
 							}
@@ -310,6 +372,7 @@ public class WebConnector {
 	    int randomNum = rand.nextInt((max - min) + 1) + min;
 	    return randomNum;
 	}
+
 
 }
 
