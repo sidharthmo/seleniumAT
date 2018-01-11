@@ -1,9 +1,9 @@
-package com.dxc.vpc.automation.common;
+package com.at.automation.common;
 
 import java.io.IOException;
 import java.util.Properties;
 
-import com.dxc.vpc.automation.util.WebConnector;
+import com.at.automation.util.WebConnector;
 
 import cucumber.api.PendingException;
 import cucumber.api.Scenario;

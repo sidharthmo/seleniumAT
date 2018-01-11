@@ -1,4 +1,4 @@
-package com.dxc.vpc.automation.util;
+package com.at.automation.util;
 
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
@@ -27,8 +27,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.dxc.vpc.automation.constant.LoginPageConstant;
-import com.dxc.vpc.automation.constant.ServicesPageConstant;
+import com.at.automation.constant.LoginPageConstant;
+import com.at.automation.constant.ServicesPageConstant;
 
 
 

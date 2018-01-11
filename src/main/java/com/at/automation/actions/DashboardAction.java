@@ -1,4 +1,4 @@
-package com.dxc.vpc.automation.actions;
+package com.at.automation.actions;
 
 
 public class DashboardAction {

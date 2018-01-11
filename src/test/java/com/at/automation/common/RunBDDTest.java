@@ -1,4 +1,4 @@
-package com.dxc.vpc.automation.common;
+package com.at.automation.common;
 
 import org.junit.runner.RunWith;
 
@@ -10,7 +10,7 @@ import cucumber.api.junit.Cucumber;
 @RunWith(Cucumber.class)
 @CucumberOptions(
 		plugin = {"html:target/cucumberHtmlReport"},
-		glue = {"com.dxc.vpc.automation.common"}
+		glue = {"com.at.automation.common"}
 )
 
 public class RunBDDTest  {

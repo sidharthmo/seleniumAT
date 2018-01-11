@@ -1,4 +1,4 @@
-package com.dxc.vpc.automation.constant;
+package com.at.automation.constant;
 
 public class ServicesPageConstant {
 	public static final String dataCenterDropDownXpath ="//*[@id='default_dc_link']";

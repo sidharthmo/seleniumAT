@@ -1,10 +1,10 @@
-package com.dxc.vpc.automation.common;
+package com.at.automation.common;
 
 import java.util.Properties;
 
-import com.dxc.vpc.automation.constant.DashboardConstant;
-import com.dxc.vpc.automation.constant.LoginPageConstant;
-import com.dxc.vpc.automation.util.WebConnector;
+import com.at.automation.constant.DashboardConstant;
+import com.at.automation.constant.LoginPageConstant;
+import com.at.automation.util.WebConnector;
 
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;

@@ -1,4 +1,4 @@
-package comdxc.vpc.automation.roughWork;
+package com.at.automation.roughWork;
 
 import java.awt.Robot;
 import java.awt.event.KeyEvent;

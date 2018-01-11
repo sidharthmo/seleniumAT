@@ -1,4 +1,4 @@
-package com.dxc.vpc.automation.util;
+package com.at.automation.util;
 
 import java.io.File;
 import java.io.FileInputStream;
